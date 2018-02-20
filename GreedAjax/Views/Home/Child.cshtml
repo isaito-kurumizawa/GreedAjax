@@ -1,0 +1,45 @@
+﻿@inherits System.Web.Mvc.WebViewPage<GreedAjax.Controllers.ChildModel>
+@{
+    ViewBag.Title = "Child Page";
+    // 子ビューだからいらない！
+    Layout = "";
+}
+
+<div id="MailForm">
+    <div class="col-md-4">
+        <h2>Child Action</h2>
+        @using (Html.BeginForm("Child", "Home", FormMethod.Post))
+        {
+            @Html.ValidationSummary("")
+            @Html.AntiForgeryToken()
+            @Html.TextBoxFor(model => model.Name)
+            @Html.TextBoxFor(model => model.Email)
+            <input id="send" type="submit" value="送信" />
+        }
+    </div>
+</div>
+<script>
+    $(document).on('click', '#send', function (event) {
+        // HTMLでの送信をキャンセル
+        event.preventDefault();
+        // formデータを取得&送信
+        var formData = $('form').serialize();
+        $.ajax({
+            async: false,
+            url: ' /Home/Child',
+            type: 'POST',
+            data: formData,
+            timeout: 10000,
+            dataType: 'text',
+            success: function (data) {
+                if (data == "Success") {
+                    location.href = "/";
+                } else {
+                    //エラーの場合、MailFormのDomを差し替える
+                    $("#MailForm").html(data);
+                }
+
+            }
+        });
+    });
+</script>
